@@ -1,4 +1,4 @@
-use gpui::{Point, Pixels};
+use gpui::{Point, Pixels, px};
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 use text::Anchor;
@@ -70,10 +70,11 @@ impl CursorAnimations {
             return false;
         }
 
-        let distance_squared = (new_position.x - old_position.x) * (new_position.x - old_position.x)
-            + (new_position.y - old_position.y) * (new_position.y - old_position.y);
+        let dx = new_position.x - old_position.x;
+        let dy = new_position.y - old_position.y;
+        let distance_squared = dx * dx.0 + dy * dy.0;
 
-        if distance_squared < Pixels(1.0) * Pixels(1.0) {
+        if distance_squared < px(1.0) {
             self.animations.remove(&cursor_id);
             return false;
         }
