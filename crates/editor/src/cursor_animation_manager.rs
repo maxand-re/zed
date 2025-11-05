@@ -1,7 +1,5 @@
-use gpui::{Point, Pixels, px};
-use std::collections::HashMap;
+use gpui::{Point, Pixels};
 use std::time::{Duration, Instant};
-use text::Anchor;
 
 const CURSOR_ANIMATION_DURATION: Duration = Duration::from_millis(150);
 
@@ -45,65 +43,4 @@ impl CursorAnimationState {
 
 fn ease_out_quint(t: f32) -> f32 {
     1.0 - (1.0 - t).powi(5)
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct CursorAnimations {
-    animations: HashMap<Anchor, CursorAnimationState>,
-}
-
-impl CursorAnimations {
-    pub fn new() -> Self {
-        Self {
-            animations: HashMap::new(),
-        }
-    }
-
-    pub fn update_cursor_position(
-        &mut self,
-        cursor_id: Anchor,
-        old_position: Point<Pixels>,
-        new_position: Point<Pixels>,
-    ) -> bool {
-        if old_position == new_position {
-            self.animations.remove(&cursor_id);
-            return false;
-        }
-
-        let distance = (new_position - old_position).magnitude();
-
-        if distance < 1.0 {
-            self.animations.remove(&cursor_id);
-            return false;
-        }
-
-        self.animations
-            .insert(cursor_id, CursorAnimationState::new(old_position, new_position));
-
-        true
-    }
-
-    pub fn get_animated_position(
-        &self,
-        cursor_id: &Anchor,
-        target_position: Point<Pixels>,
-    ) -> Point<Pixels> {
-        if let Some(animation) = self.animations.get(cursor_id) {
-            animation.current_position()
-        } else {
-            target_position
-        }
-    }
-
-    pub fn has_active_animations(&self) -> bool {
-        !self.animations.is_empty()
-    }
-
-    pub fn cleanup_completed_animations(&mut self) {
-        self.animations.retain(|_, animation| !animation.is_complete());
-    }
-
-    pub fn clear(&mut self) {
-        self.animations.clear();
-    }
 }
