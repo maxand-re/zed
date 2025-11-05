@@ -70,11 +70,9 @@ impl CursorAnimations {
             return false;
         }
 
-        let dx = new_position.x - old_position.x;
-        let dy = new_position.y - old_position.y;
-        let distance_squared = dx * dx.0 + dy * dy.0;
+        let distance = (new_position - old_position).magnitude();
 
-        if distance_squared < px(1.0) {
+        if distance < 1.0 {
             self.animations.remove(&cursor_id);
             return false;
         }

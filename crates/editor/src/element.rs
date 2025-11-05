@@ -1759,7 +1759,7 @@ impl EditorElement {
                         let selection_id = selection.id;
 
                         if let Some(anim_state) = editor.cursor_animation_state.get(&selection_id).copied() {
-                            if (anim_state.to_position - target_position).magnitude() >= px(1.0) {
+                            if (anim_state.to_position - target_position).magnitude() >= 1.0 {
                                 let new_state = CursorAnimationState::new(anim_state.current_position(), target_position);
                                 editor.cursor_animation_state.insert(selection_id, new_state);
                                 window.request_animation_frame();
