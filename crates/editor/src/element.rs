@@ -110,6 +110,7 @@ struct LineHighlightSpec {
 
 #[derive(Debug)]
 struct SelectionLayout {
+    id: usize,
     head: DisplayPoint,
     cursor_shape: CursorShape,
     is_newest: bool,
@@ -174,6 +175,7 @@ impl SelectionLayout {
         }
 
         Self {
+            id: selection.id,
             head,
             cursor_shape,
             is_newest,
@@ -1751,10 +1753,36 @@ impl EditorElement {
                         }
                     }
 
+                    let target_position = point(x, y);
+                    let animated_position = if EditorSettings::get_global(cx).smooth_cursor && selection.is_local {
+                        use crate::cursor_animation_manager::CursorAnimationState;
+                        let selection_id = selection.id;
+
+                        if let Some(anim_state) = editor.cursor_animation_state.get(&selection_id).copied() {
+                            if (anim_state.to_position - target_position).magnitude() >= Pixels(1.0) {
+                                let new_state = CursorAnimationState::new(anim_state.current_position(), target_position);
+                                editor.cursor_animation_state.insert(selection_id, new_state);
+                                window.request_animation_frame();
+                                new_state.current_position()
+                            } else {
+                                let pos = anim_state.current_position();
+                                if !anim_state.is_complete() {
+                                    window.request_animation_frame();
+                                }
+                                pos
+                            }
+                        } else {
+                            editor.cursor_animation_state.insert(selection_id, CursorAnimationState::new(target_position, target_position));
+                            target_position
+                        }
+                    } else {
+                        target_position
+                    };
+
                     let mut cursor = CursorLayout {
                         color: player_color.cursor,
                         block_width,
-                        origin: point(x, y),
+                        origin: animated_position,
                         line_height,
                         shape: selection.cursor_shape,
                         block_text,

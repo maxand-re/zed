@@ -13,6 +13,7 @@
 //! If you're looking to improve Vim mode, you should check out Vim crate that wraps Editor and overrides its behavior.
 pub mod actions;
 mod blink_manager;
+mod cursor_animation_manager;
 mod clangd_ext;
 pub mod code_context_menus;
 pub mod display_map;
@@ -77,6 +78,7 @@ use ::git::{
 use aho_corasick::AhoCorasick;
 use anyhow::{Context as _, Result, anyhow};
 use blink_manager::BlinkManager;
+use cursor_animation_manager::CursorAnimationState;
 use buffer_diff::DiffHunkStatus;
 use client::{Collaborator, ParticipantIndex, parse_zed_link};
 use clock::ReplicaId;
@@ -1180,6 +1182,7 @@ pub struct Editor {
     inlay_hints: Option<LspInlayHintData>,
     folding_newlines: Task<()>,
     pub lookup_key: Option<Box<dyn Any + Send + Sync>>,
+    cursor_animation_state: HashMap<usize, CursorAnimationState>,
 }
 
 fn debounce_value(debounce_ms: u64) -> Option<Duration> {
@@ -2259,6 +2262,7 @@ impl Editor {
             selection_drag_state: SelectionDragState::None,
             folding_newlines: Task::ready(()),
             lookup_key: None,
+            cursor_animation_state: HashMap::default(),
         };
 
         if is_minimap {

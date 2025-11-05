@@ -18,6 +18,10 @@ pub struct EditorSettingsContent {
     ///
     /// Default: true
     pub cursor_blink: Option<bool>,
+    /// Whether the cursor position animates smoothly when moving.
+    ///
+    /// Default: true
+    pub smooth_cursor: Option<bool>,
     /// Cursor shape for the default editor.
     /// Can be "bar", "block", "underline", or "hollow".
     ///

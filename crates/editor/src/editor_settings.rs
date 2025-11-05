@@ -16,6 +16,7 @@ use ui::scrollbars::{ScrollbarVisibility, ShowScrollbar};
 #[derive(Clone)]
 pub struct EditorSettings {
     pub cursor_blink: bool,
+    pub smooth_cursor: bool,
     pub cursor_shape: Option<CursorShape>,
     pub current_line_highlight: CurrentLineHighlight,
     pub selection_highlight: bool,
@@ -187,6 +188,7 @@ impl Settings for EditorSettings {
         let drag_and_drop_selection = editor.drag_and_drop_selection.unwrap();
         Self {
             cursor_blink: editor.cursor_blink.unwrap(),
+            smooth_cursor: editor.smooth_cursor.unwrap(),
             cursor_shape: editor.cursor_shape.map(Into::into),
             current_line_highlight: editor.current_line_highlight.unwrap(),
             selection_highlight: editor.selection_highlight.unwrap(),
